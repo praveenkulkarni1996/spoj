@@ -44,7 +44,7 @@ const long double PI = acosl(-1);
 class fourier {
   using cd = std::complex<long double>;
 
-  static void fft(vector<cd> & a, bool invert) {
+  inline static void fft(vector<cd> & a, bool invert) {
     const int n = a.size();
 
      for (int i = 1, j = 0; i < n; i++) {
@@ -80,7 +80,7 @@ class fourier {
   }
 
  public:
-  static vi multiply(const vi &a, const vi &b) {
+  inline static vi multiply(const vi &a, const vi &b) {
     vector<cd> fa(a.begin(), a.end());
     vector<cd> fb(b.begin(), b.end());
     int n = 1;
