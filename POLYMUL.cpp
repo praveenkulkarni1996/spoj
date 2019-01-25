@@ -39,69 +39,69 @@ using vii = vector<ii>;
 using vvi = vector<vi>;
 using vvii = vector<vii>;
 
+
+namespace fourier {
+
+using cd = std::complex<long double>;
 const long double PI = acosl(-1);
 
-class fourier {
-  using cd = std::complex<long double>;
+inline void fft(vector<cd> & a, bool invert) {
+  const int n = a.size();
 
-  static void fft(vector<cd> & a, bool invert) {
-    const int n = a.size();
-
-     for (int i = 1, j = 0; i < n; i++) {
-       int bit = n >> 1;
-       for (; j & bit; bit >>= 1) {
-         j ^= bit;
-       }
-       j ^= bit;
-       if (i < j)
-         swap(a[i], a[j]);
-     }
-
-     for (int len = 2; len <= n; len <<= 1) {
-       long double ang = (2L * PI / len) * (invert ? -1 : 1);
-       cd wlen(cosl(ang), sinl(ang));
-       for (int i = 0; i < n; i += len) {
-         cd w(1, 0);
-         for (int j = 0; j < len / 2; j++) {
-           cd u = a[i + j];
-           cd t = a[i + j + len/2] * w;
-           a[i + j] = u + t;
-           a[i + j + len/2] = u - t;
-           w *= wlen;
-         }
-       }
-     }
-
-     if (invert) {
-       for (auto &x: a) {
-         x /= n;
-       }
-     }
+  for (int i = 1, j = 0; i < n; i++) {
+    int bit = n >> 1;
+    for (; j & bit; bit >>= 1) {
+      j ^= bit;
+    }
+    j ^= bit;
+    if (i < j)
+      swap(a[i], a[j]);
   }
 
- public:
-  static vi multiply(const vi &a, const vi &b) {
-    vector<cd> fa(a.begin(), a.end());
-    vector<cd> fb(b.begin(), b.end());
-    int n = 1;
-    while (n < (int)fa.size() + (int)fb.size()) {
-      n <<= 1;
+  for (int len = 2; len <= n; len <<= 1) {
+    long double ang = (2L * PI / len) * (invert ? -1 : 1);
+    cd wlen(cosl(ang), sinl(ang));
+    for (int i = 0; i < n; i += len) {
+      cd w(1, 0);
+      for (int j = 0; j < len / 2; j++) {
+        cd u = a[i + j];
+        cd t = a[i + j + len/2] * w;
+        a[i + j] = u + t;
+        a[i + j + len/2] = u - t;
+        w *= wlen;
+      }
     }
-    fa.resize(n);
-    fb.resize(n);
-    fft(fa, false);
-    fft(fb, false);
-    for (int i = 0; i < n; i++) {
-      fa[i] *= fb[i];
-    }
-    fft(fa, true);
-    vi ans(n);
-    for (int i = 0; i < n; i++) {
-      ans[i] = std::roundl(fa[i].real());
-    }
-    return ans;
   }
-};
+
+  if (invert) {
+    for (auto &x: a) {
+      x /= n;
+    }
+  }
+}
+
+inline vi multiply(const vi &a, const vi &b) {
+  vector<cd> fa(a.begin(), a.end());
+  vector<cd> fb(b.begin(), b.end());
+  int n = 1;
+  while (n < (int)fa.size() + (int)fb.size()) {
+    n <<= 1;
+  }
+  fa.resize(n);
+  fb.resize(n);
+  fft(fa, false);
+  fft(fb, false);
+  for (int i = 0; i < n; i++) {
+    fa[i] *= fb[i];
+  }
+  fft(fa, true);
+  vi ans(n);
+  for (int i = 0; i < n; i++) {
+    ans[i] = std::roundl(fa[i].real());
+  }
+  return ans;
+}
+} // namespace fourier
 
 int32_t main() {
   ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
